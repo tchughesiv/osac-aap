@@ -117,9 +117,44 @@ def template_validate_params(
     return merged
 
 
+def template_validate_compute_instance_spec(
+    compute_instance: dict[str, Any],
+    _role_path: str,
+) -> dict[str, Any]:
+    """Validate required ComputeInstance spec fields for template provisioning.
+
+    Usage in Ansible:
+        {{ compute_instance | osac.templates.template_validate_compute_instance_spec(role_path) }}
+    """
+    if not isinstance(compute_instance, dict):
+        raise AnsibleFilterError(
+            "compute_instance must be a mapping, "
+            f"got {type(compute_instance).__name__}"
+        )
+
+    spec = compute_instance.get("spec")
+    if not isinstance(spec, dict):
+        raise AnsibleFilterError("compute_instance.spec must be a mapping")
+
+    name = (compute_instance.get("metadata") or {}).get("name", "unknown")
+    subnet_ref = str(spec.get("subnetRef") or "").strip()
+    network_attachments = spec.get("networkAttachments") or []
+
+    if not subnet_ref and not network_attachments:
+        raise AnsibleFilterError(
+            f"ComputeInstance '{name}' requires spec.subnetRef "
+            "or a non-empty spec.networkAttachments list."
+        )
+
+    return compute_instance
+
+
 class FilterModule:
     def filters(self) -> dict[str, Any]:
         return {
             "template_spec_defaults": template_spec_defaults,
             "template_validate_params": template_validate_params,
+            "template_validate_compute_instance_spec": (
+                template_validate_compute_instance_spec
+            ),
         }

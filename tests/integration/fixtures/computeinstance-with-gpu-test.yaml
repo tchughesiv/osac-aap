@@ -14,5 +14,6 @@ spec:
     sourceType: registry
     sourceRef: "quay.io/containerdisks/fedora:latest"
   runStrategy: "Always"
+  subnetRef: test-subnet
 status:
   desiredConfigVersion: "1"

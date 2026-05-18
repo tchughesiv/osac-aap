@@ -7,6 +7,11 @@
                    | combine(compute_instance.spec | default({}), recursive=True)
          }, recursive=True) }}
 
+- name: Validate ComputeInstance spec
+  ansible.builtin.set_fact:
+    compute_instance: >-
+      {{ compute_instance | osac.templates.template_validate_compute_instance_spec(role_path) }}
+
 - name: Validate and merge template parameters
   ansible.builtin.set_fact:
     params: "{{ (template_parameters | default({})) | osac.templates.template_validate_params(role_path) }}"

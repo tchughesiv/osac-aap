@@ -12,9 +12,6 @@
             - name: root-disk
               disk:
                 bus: virtio
-          interfaces:
-            - name: default
-              masquerade: {}
           rng: {}
         features:
           smm:
@@ -26,9 +23,6 @@
             vapic: {}
             spinlocks:
               spinlocks: 8191
-      networks:
-        - name: default
-          pod: {}
       volumes:
         - name: root-disk
           dataVolume:
