@@ -60,6 +60,11 @@
         timeout: 5
       when: test_empty | default(false) | bool
 
+    - name: Reset mock API call log
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ test_mock_port }}/_reset"
+      when: test_empty | default(false) | bool
+
     - name: Run publish_templates role against empty API
       ansible.builtin.include_role:
         name: osac.service.publish_templates
@@ -90,10 +95,11 @@
         that:
           - call_log.json | selectattr('method', 'equalto', 'POST') | list | length == 3
           - call_log.json | selectattr('method', 'equalto', 'PATCH') | list | length == 0
+          - call_log.json | selectattr('method', 'equalto', 'POST') | map(attribute='body') | map(attribute='metadata.tenant') | list | unique == ['shared']
         fail_msg: >-
-          Expected 3 POSTs and 0 PATCHes for empty scenario.
+          Expected 3 POSTs and 0 PATCHes for empty scenario, each with metadata.tenant=shared.
           Calls: {{ call_log.json }}
-        success_msg: "Empty scenario passed: all 3 templates created via POST"
+        success_msg: "Empty scenario passed: all 3 templates created via POST with shared tenant"
       when: test_empty | default(false) | bool
 
     - name: Stop mock server
@@ -131,6 +137,11 @@
       ansible.builtin.wait_for:
         port: "{{ test_mock_port }}"
         timeout: 5
+      when: test_populated | default(false) | bool
+
+    - name: Reset mock API call log
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ test_mock_port }}/_reset"
       when: test_populated | default(false) | bool
 
     - name: Run publish_templates role with existing item IDs
@@ -211,6 +222,11 @@
       ansible.builtin.wait_for:
         port: "{{ test_mock_port }}"
         timeout: 5
+      when: test_no_items_key | default(false) | bool
+
+    - name: Reset mock API call log
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ test_mock_port }}/_reset"
       when: test_no_items_key | default(false) | bool
 
     - name: Run publish_templates role against edge-case API

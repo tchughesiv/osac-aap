@@ -30,7 +30,12 @@
     headers:
       authorization: Bearer {{ osac_fulfillment_service_token }}
     body_format: json
-    body: "{{ network_class }}"
+    body: >-
+      {{
+        network_class | combine({
+          'metadata': (network_class.metadata | default({})) | combine({'tenant': publish_templates_tenant})
+        }, recursive=True)
+      }}
 
 - name: Create new NetworkClass
   loop: "{{ osac_network_classes }}"
@@ -47,4 +52,9 @@
     headers:
       authorization: Bearer {{ osac_fulfillment_service_token }}
     body_format: json
-    body: "{{ network_class }}"
+    body: >-
+      {{
+        network_class | combine({
+          'metadata': (network_class.metadata | default({})) | combine({'tenant': publish_templates_tenant})
+        }, recursive=True)
+      }}

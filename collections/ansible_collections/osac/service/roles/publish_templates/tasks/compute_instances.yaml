@@ -27,7 +27,12 @@
     headers:
       authorization: Bearer {{ osac_fulfillment_service_token }}
     body_format: json
-    body: "{{ template }}"
+    body: >-
+      {{
+        template | combine({
+          'metadata': (template.metadata | default({})) | combine({'tenant': publish_templates_tenant})
+        }, recursive=True)
+      }}
 
 - name: Create new ComputeInstance template
   loop: "{{ osac_compute_instance_templates }}"
@@ -42,4 +47,9 @@
     headers:
       authorization: Bearer {{ osac_fulfillment_service_token }}
     body_format: json
-    body: "{{ template }}"
+    body: >-
+      {{
+        template | combine({
+          'metadata': (template.metadata | default({})) | combine({'tenant': publish_templates_tenant})
+        }, recursive=True)
+      }}

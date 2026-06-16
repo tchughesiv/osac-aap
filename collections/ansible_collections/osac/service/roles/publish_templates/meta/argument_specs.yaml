@@ -28,3 +28,7 @@ argument_specs:
         type: str
         description: API endpoint for NetworkClass resources
         default: "{{ osac_fulfillment_service_uri }}/api/private/v1/network_classes"
+      publish_templates_tenant:
+        type: str
+        description: Tenant assigned to published platform templates
+        default: shared
